@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>200 Cafés da Manhã Antipochete</title>
+    
+    <!-- Bibliotecas de Alta Performance via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '867542332732356');
+    fbq('track', 'PageView');
+    </script>
+    <!-- End Meta Pixel Code -->
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #fbf6e1; margin: 0; }
+        h1, h2, h3, .font-heading { font-family: 'Montserrat', sans-serif; }
+        .bg-olive { background-color: #505f3c; }
+        .text-olive { color: #505f3c; }
+        .bg-cream { background-color: #fbf6e1; }
+        .border-olive { border-color: #505f3c; }
+        .bg-cta { background-color: #28b34b; }
+        
+        @keyframes pulse-custom {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .animate-pulse-custom { animation: pulse-custom 2s infinite; }
+        
+        /* Ocultar barra de scroll padrão para estética premium */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        
+        .shadow-premium { box-shadow: 0 20px 50px rgba(80, 95, 60, 0.2); }
+        .glow-cta { box-shadow: 0 0 20px rgba(40, 179, 75, 0.4); }
+    </style>
+</head>
+<body class="bg-cream overflow-x-hidden">
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=867542332732356&ev=PageView&noscript=1"
+    /></noscript>
+    
+    <div id="root"></div>
+
+    <!-- Script com Babel Standalone para rodar JSX direto no HTML sem erro de sintaxe -->
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { motion, AnimatePresence } = window.Motion;
+
+        // --- SVGs dos Ícones (Garante que funcionem sem carregar fontes externas extras) ---
+        const IconPlus = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>);
+        const IconClock = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>);
+        const IconSmile = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>);
+        const IconZap = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>);
+        const IconCheck = () => (<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>);
+        const IconShield = () => (<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>);
+        const IconCart = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>);
+
+        // --- CONSTANTES ---
+        const RECIPES = [
+            { id: 1, title: 'CAFÉ DE FRIGIDEIRA COM OVOS E FRIOS', calories: '195 CALORIAS', description: '10 MINUTOS', imageUrl: 'https://i.postimg.cc/SsFDJgJT/530db24e-a46c-49f4-85b7-39a9aa50b6e2-xl.webp' },
+            { id: 2, title: 'PIZZA RÁPIDA DE FRIGIDEIRA', calories: '207 CALORIAS', description: '3 INGREDIENTES', imageUrl: 'https://i.postimg.cc/jjZSjFgd/BAIXA-2.webp' },
+            { id: 3, title: 'PANQUECA FIT DE BANANA', calories: '183 CALORIAS', description: '7 MINUTOS', imageUrl: 'https://i.postimg.cc/q75gLF8K/fec84e0a9389fdc006a7dde8e0b3fee1-1.webp' },
+            { id: 4, title: 'OMELETE DE FRIOS TOSTADA', calories: '125 CALORIAS', description: '9 MINUTOS', imageUrl: 'https://i.postimg.cc/W3Zp71NB/SSP-2014-Ometele-de-frios-com-cebolinha-e-salsa-1-768x549.webp' },
+            { id: 5, title: 'SALADA DE FRUTAS DIGESTIVAS', calories: '120 CALORIAS', description: '6 FRUTAS', imageUrl: 'https://i.postimg.cc/4xMTFRSH/salada-de-frutas-no-pote-com-creme-de-leite-ninho-0-1-768x576.webp' }
+        ];
+
+        const BONUSES = [
+            { id: 1, title: '200 SOBREMESAS ZERO AÇÚCAR', value: 'R$29,00', imageUrl: 'https://i.postimg.cc/yxQV1gvm/maxresdefault-768x432.webp' },
+            { id: 2, title: '30 MARMITAS FIT P/ CONGELAR', value: 'R$15,00', imageUrl: 'https://i.postimg.cc/SK1FzFWj/maxresdefault-1-768x432.webp' },
+            { id: 3, title: '60 SUCOS DETOX', value: 'R$29,00', imageUrl: 'https://i.postimg.cc/XNFmnyDr/receita-de-suco-detox-768x509.webp' }
+        ];
+
+        const FAQS = [
+            { question: 'As receitas têm mesmo sabor de verdade?', answer: 'Sim! Foram testadas para serem deliciosas e saudáveis simultaneamente.' },
+            { question: 'São receitas saudáveis?', answer: 'Com certeza. Todas focadas em nutrição funcional e baixa caloria.' },
+            { question: 'Preciso saber cozinhar para aproveitar?', answer: 'Não. O passo a passo em vídeo torna tudo muito intuitivo.' },
+            { question: 'As receitas são fáceis de fazer?', answer: 'Extremamente simples. A maioria usa apenas liquidificador e frigideira.' }
+        ];
+
+        // --- COMPONENTES ---
+        const CTAButton = ({ onClick, text, large = false }) => (
+            <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onClick}
+                className={`w-full bg-cta text-white font-extrabold rounded-2xl shadow-xl uppercase tracking-wider animate-pulse-custom border-b-4 border-black/20 glow-cta ${large ? 'py-6 text-xl' : 'py-5 text-lg'}`}
+            >
+                {text}
+            </motion.button>
+        );
+
+        const FAQItemComp = ({ question, answer }) => {
+            const [isOpen, setIsOpen] = useState(false);
+            return (
+                <div className="border-b border-olive/10">
+                    <button onClick={() => setIsOpen(!isOpen)} className="w-full flex items-center justify-between py-4 text-left font-bold text-olive text-sm uppercase tracking-tight">
+                        <span>{question}</span>
+                        <svg className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+                    <AnimatePresence>
+                        {isOpen && (
+                            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                                <p className="pb-4 text-xs text-olive/70 leading-relaxed font-medium">{answer}</p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [showPurchaseNotify, setShowPurchaseNotify] = useState(false);
+            const [notifyName, setNotifyName] = useState('Maria');
+
+            useEffect(() => {
+                const names = ['Ana', 'Bruna', 'Clara', 'Daniela', 'Fernanda', 'Gabriela', 'Juliana', 'Patrícia', 'Roberta', 'Simone'];
+                const interval = setInterval(() => {
+                    setNotifyName(names[Math.floor(Math.random() * names.length)]);
+                    setShowPurchaseNotify(true);
+                    setTimeout(() => setShowPurchaseNotify(false), 4500);
+                }, 18000);
+                return () => clearInterval(interval);
+            }, []);
+
+            const scrollToOffer = () => {
+                document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            const goToCheckout = () => {
+                window.location.href = 'https://pay.cakto.com.br/vpu6qri_731287';
+            };
+
+            return (
+                <div className="max-w-md mx-auto relative bg-cream shadow-2xl min-h-screen">
+                    <motion.div className="fixed top-0 left-0 right-0 h-1 bg-cta z-[100] origin-left" initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 1.5 }} />
+
+                    {/* HERO SECTION */}
+                    <section className="bg-olive p-8 text-center text-white relative">
+                        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+                            <span className="inline-block bg-white/10 px-4 py-1.5 rounded-full text-[10px] font-bold mb-4 uppercase tracking-[0.2em] border border-white/5">VÍDEO AULAS EXCLUSIVAS</span>
+                            <h1 className="text-3xl font-extrabold leading-[1.1] mb-6 tracking-tighter uppercase">
+                                200 CAFÉS DA MANHÃ<br/>
+                                <span className="text-yellow-400 font-black">(ANTIPOCHETE)</span><br/>
+                                RECEITAS EM VÍDEOS
+                            </h1>
+                            <p className="text-base font-medium text-white/90 leading-relaxed mb-8 px-2">
+                                Desinche até <span className="text-yellow-400 font-bold">10cm de barriga em 7 dias</span> com as receitas mais deliciosas do Brasil.
+                            </p>
+                            <div className="mb-8 rounded-3xl overflow-hidden border-4 border-white/10 shadow-premium transform hover:scale-[1.02] transition-transform">
+                                <img src="https://i.postimg.cc/7bvcDqSq/7-6.webp" className="w-full h-auto" alt="Banner Principal" />
+                            </div>
+                            <CTAButton onClick={scrollToOffer} text="QUERO AS RECEITAS!" />
+                        </motion.div>
+                    </section>
+
+                    {/* BENEFÍCIOS */}
+                    <section className="p-8 text-olive">
+                        <h2 className="text-2xl font-black text-center mb-8 uppercase tracking-tighter">O QUE VOCÊ VAI RECEBER:</h2>
+                        <div className="space-y-5">
+                            {[
+                                { icon: IconPlus, text: "Receitas de até 350 calorias", sub: "Ideal para déficit calórico" },
+                                { icon: IconSmile, text: "Controle do Cortisol e Insulina", sub: "Xô estresse e fome emocional" },
+                                { icon: IconZap, text: "Proteínas e vitaminas essenciais", sub: "Energia o dia todo" },
+                                { icon: IconClock, text: "Prontas em 10-15 minutos", sub: "Praticidade absoluta" },
+                                { icon: IconCheck, text: "Passo a passo em Vídeo Aulas", sub: "Não tem como errar" }
+                            ].map((item, i) => (
+                                <div key={i} className="flex items-start gap-4 p-4 rounded-2xl bg-olive/5 border border-olive/10 shadow-sm">
+                                    <div className="w-10 h-10 shrink-0 bg-olive text-white rounded-xl flex items-center justify-center shadow-lg">
+                                        <item.icon />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-sm uppercase">{item.text}</p>
+                                        <p className="text-[10px] font-medium opacity-60 uppercase tracking-widest">{item.sub}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-10">
+                            <CTAButton onClick={scrollToOffer} text="QUERO MEU ACESSO!" />
+                        </div>
+                    </section>
+
+                    {/* NUTRICIONISTA */}
+                    <section className="bg-olive p-10 text-white text-center border-y border-white/5">
+                        <motion.div whileInView={{ opacity: 1, scale: 1 }} initial={{ opacity: 0, scale: 0.9 }}>
+                            <div className="relative inline-block mb-8">
+                                <img src="https://i.postimg.cc/wTgJ3SFv/modelo-reduzida-768x512.webp" className="rounded-3xl border-4 border-white/20 shadow-premium" alt="Maria Aguiar Nutricionista" />
+                                <div className="absolute -bottom-4 -right-4 bg-yellow-400 text-olive p-3 rounded-2xl font-black text-xs shadow-xl rotate-3">NUTRI TOP 1</div>
+                            </div>
+                            <h2 className="text-2xl font-black mb-6 leading-tight uppercase">FEITO PELA NUTRICIONISTA <br/><span className="text-yellow-400">MARIA AGUIAR</span></h2>
+                            <p className="text-sm font-medium opacity-80 leading-relaxed max-w-[280px] mx-auto uppercase tracking-tighter">
+                                Especialista em Nutrição Funcional, Maria desenvolveu o método Antipochete para ajudar mulheres a recuperarem a autoestima através da primeira refeição do dia.
+                            </p>
+                        </motion.div>
+                    </section>
+
+                    {/* GALERIA DE RECEITAS */}
+                    <section className="bg-olive p-6 pt-0">
+                        <h2 className="text-2xl font-black text-white text-center mb-10 py-4 uppercase border-t border-white/10">VOCÊ VAI APRENDER:</h2>
+                        <div className="space-y-8">
+                            {RECIPES.map((recipe) => (
+                                <motion.div key={recipe.id} className="bg-cream rounded-3xl overflow-hidden shadow-premium group" whileHover={{ y: -5 }}>
+                                    <div className="relative h-64 overflow-hidden">
+                                        <img src={recipe.imageUrl} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        <div className="absolute top-4 right-4 bg-olive text-white px-3 py-1 rounded-full text-[10px] font-black">{recipe.calories}</div>
+                                    </div>
+                                    <div className="p-6 text-center text-olive">
+                                        <h3 className="font-bold text-lg mb-2 leading-tight uppercase">{recipe.title}</h3>
+                                        <div className="flex items-center justify-center gap-2 opacity-60 text-[10px] font-black uppercase tracking-widest">
+                                            <IconClock /> {recipe.description}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                        <div className="mt-12 text-center">
+                            <h3 className="text-white font-black text-3xl mb-8 uppercase italic">+ 200 OPÇÕES!</h3>
+                            <CTAButton onClick={scrollToOffer} text="QUERO TODAS AS RECEITAS!" />
+                        </div>
+                    </section>
+
+                    {/* BÔNUS EXCLUSIVOS */}
+                    <section className="p-8 bg-cream border-t border-olive/10">
+                        <h2 className="text-2xl font-black text-olive text-center mb-10 uppercase tracking-tighter">BÔNUS EXCLUSIVOS <br/><span className="text-cta">(SÓ HOJE)</span></h2>
+                        <div className="grid grid-cols-1 gap-8">
+                            {BONUSES.map((bonus) => (
+                                <div key={bonus.id} className="relative bg-white rounded-3xl p-5 border-2 border-olive/5 shadow-premium flex flex-col items-center">
+                                    <div className="absolute -top-4 -left-4 bg-yellow-400 text-olive px-3 py-1 rounded-xl font-black text-[10px] uppercase shadow-md">BÔNUS #{bonus.id}</div>
+                                    <img src={bonus.imageUrl} className="w-full h-40 object-cover rounded-2xl mb-4 border border-olive/10" alt={bonus.title} />
+                                    <h3 className="font-bold text-sm text-olive uppercase text-center mb-1">{bonus.title}</h3>
+                                    <p className="text-[10px] font-black text-cta uppercase">VALOR: <span className="line-through text-red-500">{bonus.value}</span> | HOJE: GRÁTIS</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* DEPOIMENTOS / PROVA SOCIAL */}
+                    <section className="p-8 bg-cream">
+                        <h2 className="text-2xl font-black text-olive text-center mb-8 uppercase leading-none">QUEM JÁ ADQUIRIU <br/><span className="text-cta">RECOMENDA:</span></h2>
+                        <div className="rounded-3xl overflow-hidden shadow-premium border-4 border-white transform -rotate-1">
+                            <img src="https://i.postimg.cc/tCB5bqy9/01-1-e1753280607389.webp" className="w-full h-auto" alt="Depoimentos Reais" />
+                        </div>
+                    </section>
+
+                    {/* OFERTA FINAL */}
+                    <section id="pricing" className="p-8 bg-cream">
+                        <motion.div className="bg-olive rounded-[3rem] p-10 text-white shadow-premium relative overflow-hidden text-center" initial={{ y: 50, opacity: 0 }} whileInView={{ y: 0, opacity: 1 }}>
+                            <img src="https://i.postimg.cc/sf6QDvQR/CAFE-REDUZIDO-e1748267965918-768x717.png" className="w-full h-auto max-w-[280px] mx-auto mb-8 drop-shadow-2xl" alt="Mockup Antipochete" />
+                            <h2 className="text-3xl font-black mb-2 uppercase leading-[0.9] tracking-tighter">200 CAFÉS DA MANHÃ (ANTIPOCHETE)®</h2>
+                            <p className="text-[10px] font-bold text-yellow-400 uppercase tracking-[0.2em] mb-8">O MÉTODO NÚMERO 1 DO BRASIL</p>
+                            
+                            <div className="mb-10 space-y-1">
+                                <p className="text-lg opacity-40 line-through font-bold">De R$129,00</p>
+                                <p className="text-sm font-bold uppercase">Por Apenas</p>
+                                <div className="flex flex-col items-center">
+                                    <span className="text-5xl font-black text-yellow-400 tracking-tighter">R$29,90</span>
+                                    <span className="text-[10px] font-bold opacity-60 uppercase">À vista ou em até 3x</span>
+                                </div>
+                            </div>
+                            
+                            <CTAButton onClick={goToCheckout} text="COMPRAR AGORA!" large />
+                            
+                            <div className="mt-8 flex items-center justify-center gap-2 text-[10px] font-black uppercase opacity-60">
+                                <IconShield /> COMPRA 100% SEGURA
+                            </div>
+                        </motion.div>
+                    </section>
+
+                    {/* GARANTIA */}
+                    <section className="p-10 text-center">
+                        <div className="bg-white rounded-3xl p-8 border-4 border-olive shadow-xl relative mt-4">
+                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-olive text-yellow-400 p-4 rounded-full shadow-premium">
+                                <IconShield />
+                            </div>
+                            <h2 className="text-xl font-black text-olive mb-4 mt-6 uppercase">7 DIAS DE GARANTIA INCONDICIONAL</h2>
+                            <p className="text-xs text-olive font-medium leading-relaxed uppercase tracking-tighter">
+                                Teste o método por uma semana completa. Se não tiver resultados ou não gostar das receitas, basta um e-mail para receber 100% do seu dinheiro de volta. Sem perguntas!
+                            </p>
+                        </div>
+                    </section>
+
+                    {/* FAQ */}
+                    <section className="p-8 bg-cream">
+                        <h2 className="text-2xl font-black text-olive text-center mb-10 uppercase tracking-tighter">DÚVIDAS FREQUENTES</h2>
+                        <div className="space-y-1">
+                            {FAQS.map((faq, i) => <FAQItemComp key={i} {...faq} />)}
+                        </div>
+                    </section>
+
+                    {/* FOOTER */}
+                    <footer className="p-16 text-center text-olive/30 bg-cream text-[10px] uppercase font-black tracking-widest border-t border-olive/5">
+                        <div className="mb-4 flex justify-center gap-6">
+                            <a href="#" className="hover:text-olive transition-colors">POLÍTICAS DE PRIVACIDADE</a>
+                            <a href="#" className="hover:text-olive transition-colors">TERMOS DE USO</a>
+                        </div>
+                        <p>© 2024 ANTIPOCHETE - TODOS OS DIREITOS RESERVADOS</p>
+                        <p className="mt-2 opacity-50">Este site não é afiliado ao Facebook ou Google.</p>
+                    </footer>
+
+                    {/* NOTIFICAÇÃO DE VENDA FLUTUANTE */}
+                    <AnimatePresence>
+                        {showPurchaseNotify && (
+                            <motion.div initial={{ x: -100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -100, opacity: 0 }} transition={{ type: 'spring', stiffness: 100 }} className="fixed bottom-6 left-4 right-4 z-[200]">
+                                <div className="bg-white rounded-2xl p-4 shadow-2xl border border-gray-100 flex items-center gap-4 max-w-[320px] mx-auto">
+                                    <div className="w-12 h-12 bg-cta text-white rounded-xl flex items-center justify-center shadow-lg">
+                                        <IconCart />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] font-black text-cta uppercase leading-none mb-1">COMPRA APROVADA!</p>
+                                        <p className="text-xs font-bold text-olive truncate uppercase tracking-tighter">{notifyName} garantiu as 200 receitas agora!</p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
